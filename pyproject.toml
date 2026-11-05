@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patbench"
+version = "1.0.0.dev0"
+description = "Data processing pipeline of PatBench: US-patent SAR extraction, target mapping, benchmark construction, structures and evaluation"
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.9"
+dependencies = ["numpy", "pandas", "pyarrow", "scipy"]
+
+[project.optional-dependencies]
+chem = ["rdkit"]          # extraction, standardisation, build, protocols, baselines
+baselines = ["scikit-learn", "rdkit"]
+structures = ["gemmi"]    # fetch_structures.py, check_structures.py
+dev = ["pytest"]
+
+[project.scripts]
+patbench = "patbench.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "rdkit: needs RDKit (the stage unit tests of the extraction code)",
+]

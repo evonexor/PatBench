@@ -1,0 +1,13 @@
+path_in_workspace	sha256	reason
+outputs/patbench-v1.0-20261030-r6/scripts/freeze_r6.py	b8e7b383b02b8ebaf006cf666f16b9c00b58b60e06ea33a395bfcb175965e4b0	release housekeeping: writes the freeze block and notes into the data release README (Chinese text)
+outputs/patbench-v1.0-20261030-r6/scripts/freeze_r6.sh	5b704959e6fe324cea8fca79a1daf9962e3540c4af9f06320e81e0efd16e21fe	release housekeeping: SHA256SUMS and the read-only switch of the r6 directory (see docs/RELEASES.md)
+outputs/patbench-v1.0-20261030-r6/scripts/note_unresolved_r6.py	57518d140d7261a0f5f411f66f18355c455fa2a236e637a36ad7eefb6618c951	release housekeeping: appends the extension-trial note to the data release README
+outputs/patbench-v1.0-20261030-r6/scripts/stamp_baselines_r6.py	a726c9aaef50a5fd39866aae9d3ab6fc1cdea9400503b30f0fc8d50d26145e53	release housekeeping: writes baseline results into the data release README and manifest
+outputs/patbench-v1.0-20261030-r6/scripts/stamp_revision.py	e032d1c5a3a9e3a338931f111acd7e48d95ecdb3ddfe36f8e8f4429fdd78fdd3	release housekeeping: adds a revision note to release_manifest.json
+outputs/alias-expansion-20261031/scripts/alias_expand.py	6bb08606279a3a0f5d7d70fc6725da32f3f8e0922382d9b3411b73af873752eb	superseded: first rule-based expander, replaced by alias_repair.py and alias_expand_independent.py
+outputs/alias-expansion-20261031/scripts/alias_validate.py	7ef45c6a5c2d2d907cd64a678e1f513e9c8a561fefc0b2bae83bde8a7ed2875f	superseded by alias_validate2.py
+outputs/alias-expansion-20261031/scripts/make_expand_v7.py	f30ed6082da46935ab9459f0fc9953cd4e46d144a873a6febec5d258b37daf27	trial rule extension that was not merged into r6 (see docs/RELEASES.md)
+outputs/alias-expansion-20261031/scripts/draw_labels.py	5230e8ebd2b189d09aa24e64c6b24ffb0bbb590c2fa5df93b1399044c0473d05	visual inspection helper for alias labels
+outputs/patbench-v1.0-20261030-r4/scripts/carry_over_target_files.py	-	r4 only: reused the r3 target files; not used by r6
+runs/r6_frozen_20261101/scripts/ (all files except evaluate.py)	-	model-run harness of the frozen evaluation run (adapters, docking and DeepPurpose workers, scoring); not part of the data pipeline
+outputs/patbench-r6-fewshot-baselines-20261101/scripts/ (score.py, verify.py, run.sh, evaluate_patent.py)	-	scoring and verification helpers of the corrected few-shot baseline run; evaluate_patent.py is byte-identical to evaluate_patent_bootstrap.py

@@ -1,0 +1,15 @@
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+.DS_Store
+._*
+build/
+dist/
+.venv/
+
+# data never goes into git: the workspace and every release live outside this repository
+/data/*
+!/data/README.md
+*.parquet
+*.zip

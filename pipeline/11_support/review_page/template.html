@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Target-mapping review · PatBench</title>
+<style>
+:root{
+  --bg:#f5f6f8; --surface:#ffffff; --text:#1b1f24; --muted:#5a6572; --line:#dbe0e6;
+  --accent:#2457d6; --accent-bg:#e8eefc;
+  --ok:#167a3a; --ok-bg:#e3f3e8; --bad:#b3261e; --bad-bg:#fbe7e5; --unsure:#8a5a00; --unsure-bg:#fff2cf;
+  --chip:#eceff3; --warn-bg:#fff7e0; --shadow:0 1px 2px rgba(20,30,50,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14171b; --surface:#1d2127; --text:#e8ebef; --muted:#9aa5b1; --line:#323944;
+    --accent:#7aa2ff; --accent-bg:#1f2b4a;
+    --ok:#6fd08c; --ok-bg:#183323; --bad:#ff8a80; --bad-bg:#40201e; --unsure:#f1c25a; --unsure-bg:#3a2f14;
+    --chip:#2a3038; --warn-bg:#3a3014; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1d2127; --text:#e8ebef; --muted:#9aa5b1; --line:#323944;
+  --accent:#7aa2ff; --accent-bg:#1f2b4a;
+  --ok:#6fd08c; --ok-bg:#183323; --bad:#ff8a80; --bad-bg:#40201e; --unsure:#f1c25a; --unsure-bg:#3a2f14;
+  --chip:#2a3038; --warn-bg:#3a3014; --shadow:none;
+}
+*{box-sizing:border-box}
+html{color-scheme:light dark}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Segoe UI",sans-serif}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.top{background:var(--surface);border-bottom:1px solid var(--line);box-shadow:var(--shadow)}
+@media (min-height:760px) and (min-width:700px){.top{position:sticky;top:0;z-index:10}.card{scroll-margin-top:190px}}
+.top .wrap{padding-top:12px;padding-bottom:10px}
+h1{font-size:18px;margin:0 0 2px;font-weight:650}
+.sub{margin:0 0 8px;color:var(--muted);font-size:13px}
+.progress{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.bar{flex:1 1 220px;height:8px;background:var(--chip);border-radius:99px;overflow:hidden;min-width:160px}
+.bar>i{display:block;height:100%;background:var(--accent);width:0;transition:width .2s}
+.ptxt{font-size:13px;color:var(--muted);white-space:nowrap}
+.ptxt b{color:var(--text)}
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.tab{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:99px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer;min-height:32px}
+.tab[aria-pressed="true"]{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);font-weight:600}
+.tab small{color:var(--muted);margin-left:4px}
+.filters{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.filters input[type=search],.filters select{font:inherit;font-size:13px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);min-height:34px}
+.filters input[type=search]{flex:1 1 200px;min-width:160px}
+.spacer{flex:1}
+.btn{font:inherit;font-size:13px;padding:6px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);cursor:pointer;min-height:34px}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+:root[data-theme="dark"] .btn.primary{color:#0d1220}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .btn.primary{color:#0d1220}}
+.btn:focus-visible,.tab:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.warn{background:var(--warn-bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:13px;margin-top:8px;display:none}
+main{padding:14px 0 60px}
+.howto{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.howto summary{cursor:pointer;font-weight:600}
+.howto ol,.howto ul{margin:6px 0 6px 20px;padding:0}
+.howto p{margin:6px 0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:12px;box-shadow:var(--shadow);scroll-margin-top:12px}
+.card.active{outline:2px solid var(--accent);outline-offset:1px}
+.card-head{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.gid{font-weight:700;font-variant-numeric:tabular-nums}
+.chip{display:inline-block;background:var(--chip);border-radius:6px;padding:1px 8px;font-size:12px;color:var(--muted)}
+.chip.p1{background:var(--bad-bg);color:var(--bad)}
+.chip.p2{background:var(--unsure-bg);color:var(--unsure)}
+.chip.p3{background:var(--accent-bg);color:var(--accent)}
+.status{margin-left:auto;font-size:12px;font-weight:600;padding:1px 10px;border-radius:99px;background:var(--chip);color:var(--muted)}
+.status.correct{background:var(--ok-bg);color:var(--ok)}
+.status.wrong{background:var(--bad-bg);color:var(--bad)}
+.status.unsure{background:var(--unsure-bg);color:var(--unsure)}
+.title{margin:6px 0 6px;font-size:15px;font-weight:600}
+.why{background:var(--chip);border-radius:8px;padding:6px 12px;margin:6px 0 10px;font-size:13px}
+.why ul{margin:2px 0 2px 16px;padding:0}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:10px 18px}
+.col h4{margin:0 0 4px;font-size:12px;letter-spacing:.04em;color:var(--muted);font-weight:600}
+dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;font-size:13.5px}
+dt{color:var(--muted);white-space:nowrap}
+dd{margin:0;overflow-wrap:anywhere}
+.big{font-weight:650}
+.dim{color:var(--muted)}
+details.full summary{cursor:pointer;color:var(--muted);font-size:12px}
+.decide{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;align-items:start;margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.seg{display:flex;gap:6px;flex-wrap:wrap}
+.seg label{position:relative}
+.seg input{position:absolute;opacity:0;inset:0;cursor:pointer}
+.seg span{display:inline-block;padding:6px 14px;border:1px solid var(--line);border-radius:8px;font-size:14px;cursor:pointer;min-height:34px;background:var(--surface)}
+.seg input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.seg input:checked+span.c{background:var(--ok-bg);border-color:var(--ok);color:var(--ok);font-weight:600}
+.seg input:checked+span.w{background:var(--bad-bg);border-color:var(--bad);color:var(--bad);font-weight:600}
+.seg input:checked+span.u{background:var(--unsure-bg);border-color:var(--unsure);color:var(--unsure);font-weight:600}
+.fields{display:grid;grid-template-columns:minmax(150px,220px) 1fr;gap:8px}
+.fields input,.fields textarea{font:inherit;font-size:13.5px;padding:6px 10px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--text);width:100%}
+.fields textarea{min-height:34px;resize:vertical}
+.clear{border:0;background:none;color:var(--muted);font-size:12px;cursor:pointer;text-decoration:underline;padding:6px}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:8px 16px;border-radius:8px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+.toast.show{opacity:.95}
+footer{color:var(--muted);font-size:12px;padding:10px 0 30px}
+@media (max-width:640px){
+  .decide{grid-template-columns:1fr}
+  .fields{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <h1>Target-mapping review · PatBench test groups</h1>
+    <p class="sub"><span id="nTotal"></span> groups: the test groups of rank_ic50 and rank_ki_kd, plus <span id="nExtra"></span> test groups of the other tasks (rank_highcontrast, rank_complex_mutant, rank_ec50) that are not among them. No verdict is pre-filled; every judgement is the reviewer's.</p>
+    <div class="progress">
+      <div class="bar"><i id="barFill"></i></div>
+      <div class="ptxt" id="ptxt"></div>
+    </div>
+    <div class="tabs" id="tabs" role="group" aria-label="Filter by priority"></div>
+    <div class="filters">
+      <input type="search" id="q" placeholder="Search: group id / patent / label / gene / UniProt" aria-label="Search">
+      <select id="fTask" aria-label="Task"><option value="">All tasks</option><option value="rank_ic50">rank_ic50</option><option value="rank_ki_kd">rank_ki_kd</option></select>
+      <select id="fTier" aria-label="Tier"><option value="">All tiers</option><option value="novel">novel</option><option value="reference">reference</option></select>
+      <select id="fStatus" aria-label="Status"><option value="">All statuses</option><option value="todo">Not reviewed</option><option value="done">Reviewed</option><option value="correct">Correct</option><option value="wrong">Wrong</option><option value="unsure">Unsure</option></select>
+      <select id="fSort" aria-label="Sort"><option value="prio">By priority</option><option value="id">By group id</option></select>
+      <span class="spacer"></span>
+      <button class="btn primary" id="btnExport">Export TSV</button>
+      <button class="btn" id="btnImport">Import progress</button>
+      <input type="file" id="fileImport" accept=".tsv,.txt,.json" hidden>
+      <button class="btn" id="btnReset">Clear</button>
+    </div>
+    <div class="warn" id="warn"></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <details class="howto" open>
+    <summary>How to review (30 seconds)</summary>
+    <p>Each card is one test group, i.e. one IC50 or Ki/Kd table of one patent. There is one question to answer: <b>is the protein measured in this table the UniProt entry we mapped it to?</b></p>
+    <ol>
+      <li>Left column: the label printed in the patent and the patent title; use them to decide which protein was actually measured.</li>
+      <li>Middle column: the protein we mapped it to (gene, protein name, species, mutation). Watch isoforms (α/β/δ/γ), species, wild type versus mutant, and complex subunits.</li>
+      <li>If unsure, open the patent number (Google Patents) to read the table header, or the UniProt accession to check the entry.</li>
+    </ol>
+    <ul>
+      <li><b>Correct</b>: protein, species and isoform are all right.</li>
+      <li><b>Wrong</b>: any of them is wrong. Give the reason in the note and, if you can determine it, the correct UniProt accession.</li>
+      <li><b>Unsure</b>: the patent text does not settle it. Say in the note what information is missing.</li>
+    </ul>
+    <p>The "Why review" box at the top of each card lists the doubts raised by the automatic checks. "Label does not name the target" is a crude string comparison and gives false alarms for Greek letters (δ versus delta), abbreviations and aliases; "public cross-reference differs" may be an error on the side of the public database. Both are clues, not conclusions.</p>
+    <p>This page reviews only the <b>target mapping</b>, not molecular structures or values. Shortcuts: <kbd>j</kbd>/<kbd>k</kbd> next/previous card, <kbd>1</kbd>/<kbd>2</kbd>/<kbd>3</kbd> = correct/wrong/unsure, <kbd>0</kbd> clear. Progress is stored in this browser; export the TSV regularly.</p>
+  </details>
+  <div id="list"></div>
+  <footer>
+    Data: <code>target_review_test.tsv</code> of the release; the additional fields come from the same release's <code>target_audit.parquet</code> and <code>groups.parquet</code>.
+    The exported TSV keeps the 20 columns of the original table; <code>reviewer_verdict</code> holds correct / wrong / unsure, <code>reviewer_note</code> the note, and one column <code>reviewer_corrected_uniprot</code> is appended.
+    This page does not modify the dataset. Cards marked "not in the original table" come from <code>eval_support/target_review_test_other_tasks.tsv</code> (test groups of the other tasks, with the same fields), so the exported TSV has one row per card.
+  </footer>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+(function(){
+"use strict";
+var DATA = JSON.parse(document.getElementById('data').textContent);
+var KEY = 'patbench-r4-target-review-v1';
+var ORIG_COLS = ["group_id","task","tier","patent_core","patent_title","assay_label_as_printed","activity_header",
+  "mapped_gene_or_identity","protein_name","organism","uniprot","confidence","curator_note","sequence_id",
+  "sequence_kind","seq_len","label_check","xref_status","reviewer_verdict","reviewer_note"];
+var GENERIC_LABEL = {10068:1, 6878:1};
+var VERDICT = {correct:'Correct', wrong:'Wrong', unsure:'Unsure'};
+var state = {}, storageOK = true, changes = 0;
+var f = {tab:'all', q:'', task:'', tier:'', status:'', sort:'prio'};
+var activeId = null;
+
+DATA.forEach(function(r){
+  r.id = +r.group_id;
+  r.prio = r.xref_status==='differs' ? 1 : r.label_check==='label_does_not_name_target' ? 2 : r.confidence==='medium' ? 3 : 4;
+  r.hay = [r.group_id,r.patent_core,r.patent_title,r.assay_label_as_printed,r.activity_header,r.mapped_gene_or_identity,
+           r.protein_name,r.uniprot,r.curator_note,r.xref_accession,r.xref_symbol].join(' ').toLowerCase();
+});
+
+function $(id){ return document.getElementById(id); }
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function load(){ try{ var s = localStorage.getItem(KEY); if(s) state = JSON.parse(s) || {}; }catch(e){ storageOK = false; } }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){ storageOK = false; } showWarn(); }
+function showWarn(){
+  var w = $('warn'), msg = [];
+  if(!storageOK) msg.push('This browser does not allow saving progress; closing the page loses it, so export the TSV often.');
+  if(changes>0) msg.push(changes+' change(s) since the last export have not been exported.');
+  w.style.display = msg.length ? 'block' : 'none';
+  w.textContent = msg.join(' ');
+}
+function toast(t){ var e=$('toast'); e.textContent=t; e.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(function(){e.classList.remove('show');},2200); }
+function st(id){ return state[id] || {}; }
+
+function why(r){
+  var out = [];
+  if(r.xref_status==='differs'){
+    var sym = r.xref_symbol ? '('+r.xref_symbol+')' : '';
+    out.push('The public database '+esc(r.xref_db||'')+' cross-references this patent to <b>'+esc(r.xref_accession)+esc(sym)+'</b>, which differs from our mapping <b>'+esc(r.uniprot)+' ('+esc(r.mapped_gene_or_identity)+')</b>. Decide which side is right.');
+  }
+  if(r.label_check==='label_does_not_name_target'){
+    if(GENERIC_LABEL[r.id]) out.push('The label describes only the assay method and names no target; the target was inferred from the patent title or a public cross-reference. This group was flagged earlier as a priority.');
+    else out.push('The automatic comparison found no gene or protein name in the label/header (a crude string comparison: aliases and Greek letters often cause false alarms, but the mapping may really be wrong).');
+  }
+  if(r.confidence==='medium') out.push('Medium confidence'+(r.curator_note?': '+esc(r.curator_note):'')+'.');
+  if(r.sequence_kind && r.sequence_kind!=='full_length') out.push('Sequence kind is <b>'+esc(r.sequence_kind)+'</b>, not full length.');
+  if(r.sequence_caveat) out.push('Sequence caveat: '+esc(r.sequence_caveat)+'.');
+  if(r.mutation) out.push('Recorded variant/mutation: <b>'+esc(r.mutation)+'</b>.');
+  if(!out.length) out.push('All automatic checks passed (high confidence, label names the target, public cross-reference agrees or is absent). A spot check is enough.');
+  return out;
+}
+function prioChip(r){
+  var t = {1:'Priority 1 · cross-reference differs', 2:'Priority 2 · label does not name the target', 3:'Priority 3 · medium confidence', 4:'Spot check · all automatic checks passed'}[r.prio];
+  return '<span class="chip '+(r.prio<4?'p'+r.prio:'')+'">'+t+'</span>';
+}
+function shortName(n){ var i = n.indexOf(' ('); return i>0 ? n.slice(0,i) : n; }
+
+function card(r){
+  var s = st(r.id), v = s.v||'';
+  var gp = 'https://patents.google.com/patent/'+encodeURIComponent(r.patent_core);
+  var up = 'https://www.uniprot.org/uniprotkb/'+encodeURIComponent(r.uniprot)+'/entry';
+  var orgNote = '';
+  if(r.organism_stated || r.organism_detected){
+    orgNote = '<div class="dim">Species: the patent states “'+esc(r.organism_stated||'—')+'”, detected as “'+esc(r.organism_detected||'—')+'”, resolved by '+esc(r.organism_resolution||'—')+'</div>';
+  }
+  var xref;
+  if(r.xref_status==='no_cross_reference'){
+    xref = '<dl><dt>Status</dt><dd class="dim">No public cross-reference for this patent, nothing to compare with</dd></dl>';
+  } else {
+    xref = '<dl><dt>Source</dt><dd>'+esc(r.xref_db||'—')+'</dd>'+
+           '<dt>Accession</dt><dd>'+esc(r.xref_accession||'—')+'</dd>'+
+           '<dt>Symbol</dt><dd>'+esc(r.xref_symbol||'—')+'</dd>'+
+           '<dt>Agrees</dt><dd><b>'+(r.xref_status==='agrees'?'Yes':'No')+'</b></dd>'+
+           (r.xref_value_match?'<dt>Value comparison</dt><dd class="dim">'+esc(r.xref_value_match)+' (upstream field, meaning not verified on this page)</dd>':'')+'</dl>';
+  }
+  var pn = shortName(r.protein_name||'');
+  var full = (r.protein_name && r.protein_name!==pn) ? '<details class="full"><summary>All names</summary>'+esc(r.protein_name)+'</details>' : '';
+  var w = why(r).map(function(x){return '<li>'+x+'</li>';}).join('');
+  return '<article class="card'+(activeId===r.id?' active':'')+'" id="g'+r.id+'" data-id="'+r.id+'">'+
+  '<div class="card-head"><span class="gid">#'+r.id+'</span>'+prioChip(r)+
+    '<span class="chip">'+esc(r.task)+'</span><span class="chip">'+esc(r.tier)+'</span>'+(r.extra?'<span class="chip">Not in the original table</span>':'')+'<span class="chip">Confidence '+esc(r.confidence)+'</span>'+
+    '<span class="status '+v+'" data-status>'+(VERDICT[v]||'Not reviewed')+'</span></div>'+
+  '<h3 class="title"><a href="'+gp+'" target="_blank" rel="noopener">'+esc(r.patent_core)+'</a> · '+esc(r.patent_title)+'</h3>'+
+  '<div class="why"><b>Why review</b><ul>'+w+'</ul></div>'+
+  '<div class="cols">'+
+    '<section class="col"><h4>Printed in the patent</h4><dl>'+
+      '<dt>Label</dt><dd class="big">'+esc(r.assay_label_as_printed||'—')+'</dd>'+
+      '<dt>Header</dt><dd>'+esc(r.activity_header||'—')+'</dd>'+
+      '<dt>Endpoint</dt><dd>'+esc(r.endpoint||'—')+'</dd>'+
+      '<dt>Molecules</dt><dd>'+esc(r.n_molecules||'—')+'</dd>'+
+    '</dl></section>'+
+    '<section class="col"><h4>Mapped by us</h4><dl>'+
+      '<dt>Gene</dt><dd class="big">'+esc(r.mapped_gene_or_identity||'—')+'</dd>'+
+      '<dt>Protein</dt><dd>'+esc(pn)+full+'</dd>'+
+      '<dt>Species</dt><dd>'+esc(r.organism||'—')+orgNote+'</dd>'+
+      '<dt>UniProt</dt><dd><a href="'+up+'" target="_blank" rel="noopener">'+esc(r.uniprot)+'</a></dd>'+
+      '<dt>Sequence</dt><dd>'+esc(r.sequence_kind||'—')+','+esc(r.seq_len||'?')+' aa'+(r.mutation?', variant '+esc(r.mutation):'')+'</dd>'+
+      '<dt>Curator note</dt><dd>'+esc(r.curator_note||'—')+'</dd>'+
+    '</dl></section>'+
+    '<section class="col"><h4>Public cross-reference</h4>'+xref+'</section>'+
+  '</div>'+
+  '<div class="decide"><div class="seg" role="radiogroup" aria-label="Verdict, group '+r.id+'">'+
+    ['correct','wrong','unsure'].map(function(k,i){
+      return '<label><input type="radio" name="v'+r.id+'" value="'+k+'"'+(v===k?' checked':'')+'><span class="'+['c','w','u'][i]+'">'+['✓ Correct','✗ Wrong','? Unsure'][i]+'</span></label>';
+    }).join('')+
+    '<button type="button" class="clear" data-clear>Clear</button></div>'+
+    '<div class="fields"><input type="text" data-u placeholder="If wrong: correct UniProt (optional)" value="'+esc(s.u||'')+'" aria-label="Correct UniProt">'+
+    '<textarea data-n rows="1" placeholder="Note (reason, evidence, missing information)" aria-label="Note">'+esc(s.n||'')+'</textarea></div></div>'+
+  '</article>';
+}
+
+function counts(){
+  var c = {correct:0, wrong:0, unsure:0};
+  DATA.forEach(function(r){ var v = st(r.id).v; if(v) c[v]++; });
+  return c;
+}
+function inTab(r){
+  if(f.tab==='all') return true;
+  if(f.tab==='need') return r.prio<4;
+  if(f.tab==='extra') return !!r.extra;
+  return r.prio===+f.tab;
+}
+function pass(r){
+  if(!inTab(r)) return false;
+  if(f.task && r.task!==f.task) return false;
+  if(f.tier && r.tier!==f.tier) return false;
+  var v = st(r.id).v||'';
+  if(f.status==='todo' && v) return false;
+  if(f.status==='done' && !v) return false;
+  if((f.status==='correct'||f.status==='wrong'||f.status==='unsure') && v!==f.status) return false;
+  if(f.q && r.hay.indexOf(f.q)<0) return false;
+  return true;
+}
+function visible(){
+  var a = DATA.filter(pass);
+  a.sort(f.sort==='id' ? function(x,y){return x.id-y.id;} : function(x,y){return x.prio-y.prio || x.id-y.id;});
+  return a;
+}
+function renderTabs(){
+  var defs = [['all','All'],['need','To review (1–3)'],['1','Priority 1 cross-reference differs'],['2','Priority 2 label does not name the target'],['3','Priority 3 medium confidence'],['4','Spot check'],['extra','Test groups of other tasks']];
+  $('tabs').innerHTML = defs.map(function(d){
+    var rs = DATA.filter(function(r){ return d[0]==='all' ? true : d[0]==='need' ? r.prio<4 : d[0]==='extra' ? !!r.extra : r.prio===+d[0]; });
+    var done = rs.filter(function(r){return st(r.id).v;}).length;
+    return '<button class="tab" data-tab="'+d[0]+'" aria-pressed="'+(f.tab===d[0])+'">'+d[1]+'<small>'+done+'/'+rs.length+'</small></button>';
+  }).join('');
+}
+function renderProgress(){
+  var c = counts(), n = c.correct+c.wrong+c.unsure;
+  $('barFill').style.width = (100*n/DATA.length)+'%';
+  $('ptxt').innerHTML = 'Reviewed <b>'+n+' / '+DATA.length+'</b> · Correct '+c.correct+' · Wrong '+c.wrong+' · Unsure '+c.unsure;
+  renderTabs();
+}
+function renderList(){
+  var a = visible();
+  $('list').innerHTML = a.length ? a.map(card).join('') : '<div class="empty">No group matches</div>';
+  renderProgress();
+}
+function setVerdict(id, v){
+  var s = state[id] || (state[id] = {});
+  s.v = v; s.t = new Date().toISOString();
+  if(!s.v && !s.u && !s.n) delete state[id];
+  changes++; save(); renderProgress();
+  var el = document.getElementById('g'+id);
+  if(el){
+    var b = el.querySelector('[data-status]'); b.className = 'status '+(v||''); b.textContent = VERDICT[v]||'Not reviewed';
+    var radios = el.querySelectorAll('input[type=radio]'); radios.forEach(function(x){ x.checked = (x.value===v); });
+  }
+}
+function setActive(id, scroll){
+  if(activeId!=null){ var o = document.getElementById('g'+activeId); if(o) o.classList.remove('active'); }
+  activeId = id;
+  var el = document.getElementById('g'+id);
+  if(el){ el.classList.add('active'); if(scroll) el.scrollIntoView({block:'center', behavior:'smooth'}); }
+}
+
+var list = $('list'), tmr = null;
+list.addEventListener('change', function(e){
+  var t = e.target; if(t.type!=='radio') return;
+  var id = +t.closest('.card').dataset.id; setActive(id,false); setVerdict(id, t.value);
+});
+list.addEventListener('input', function(e){
+  var t = e.target, c = t.closest('.card'); if(!c) return;
+  var id = +c.dataset.id, s = state[id] || (state[id] = {});
+  if(t.hasAttribute('data-u')) s.u = t.value.trim(); else if(t.hasAttribute('data-n')) s.n = t.value;
+  s.t = new Date().toISOString();
+  clearTimeout(tmr); tmr = setTimeout(function(){ if(!s.v && !s.u && !s.n) delete state[id]; changes++; save(); }, 400);
+});
+list.addEventListener('click', function(e){
+  var c = e.target.closest('.card'); if(!c) return;
+  var id = +c.dataset.id;
+  if(e.target.hasAttribute('data-clear')){ setVerdict(id,''); }
+  if(activeId!==id) setActive(id,false);
+});
+$('tabs').addEventListener('click', function(e){
+  var b = e.target.closest('.tab'); if(!b) return; f.tab = b.dataset.tab; renderList();
+});
+$('q').addEventListener('input', function(e){ f.q = e.target.value.trim().toLowerCase(); renderList(); });
+[['fTask','task'],['fTier','tier'],['fStatus','status'],['fSort','sort']].forEach(function(p){
+  $(p[0]).addEventListener('change', function(e){ f[p[1]] = e.target.value; renderList(); });
+});
+document.addEventListener('keydown', function(e){
+  var tg = e.target, tag = tg && tg.tagName;
+  if(tag==='INPUT' && tg.type==='search' || tag==='TEXTAREA' || tag==='SELECT' || (tag==='INPUT' && tg.type==='text')) return;
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  var ids = visible().map(function(r){return r.id;});
+  if(!ids.length) return;
+  var i = ids.indexOf(activeId);
+  if(e.key==='j'){ setActive(ids[Math.min(ids.length-1, i<0?0:i+1)], true); e.preventDefault(); }
+  else if(e.key==='k'){ setActive(ids[Math.max(0, i<0?0:i-1)], true); e.preventDefault(); }
+  else if(activeId!=null && (e.key==='1'||e.key==='2'||e.key==='3'||e.key==='0')){
+    setVerdict(activeId, {'1':'correct','2':'wrong','3':'unsure','0':''}[e.key]); e.preventDefault();
+  }
+});
+
+function clean(x){ return String(x==null?'':x).replace(/[\t\r\n]+/g,' ').trim(); }
+function download(name, text, type){
+  var b = new Blob([text], {type:type}), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+$('btnExport').addEventListener('click', function(){
+  var cols = ORIG_COLS.concat(['reviewer_corrected_uniprot']);
+  var rows = [cols.join('\t')];
+  DATA.slice().sort(function(a,b){return a.id-b.id;}).forEach(function(r){
+    var s = st(r.id);
+    var row = ORIG_COLS.map(function(c){ return c==='reviewer_verdict' ? (s.v||'') : c==='reviewer_note' ? (s.n||'') : r[c]; });
+    row.push(s.u||'');
+    rows.push(row.map(clean).join('\t'));
+  });
+  download('target_review_test_reviewed.tsv', '﻿'+rows.join('\n')+'\n', 'text/tab-separated-values;charset=utf-8');
+  changes = 0; showWarn();
+  toast('Exported target_review_test_reviewed.tsv (including blank rows of unreviewed groups, '+DATA.length+' rows)');
+});
+$('btnImport').addEventListener('click', function(){ $('fileImport').click(); });
+$('fileImport').addEventListener('change', function(e){
+  var file = e.target.files[0]; if(!file) return;
+  var rd = new FileReader();
+  rd.onload = function(){
+    var text = String(rd.result).replace(/^﻿/,''), n = 0;
+    var lines = text.split(/\r?\n/).filter(function(l){return l.length;});
+    var h = lines.shift().split('\t'), ig = h.indexOf('group_id'), iv = h.indexOf('reviewer_verdict'),
+        inn = h.indexOf('reviewer_note'), iu = h.indexOf('reviewer_corrected_uniprot');
+    if(ig<0 || iv<0){ toast('Not a TSV exported by this page (group_id / reviewer_verdict column missing)'); return; }
+    var known = {}; DATA.forEach(function(r){ known[r.id] = 1; });
+    lines.forEach(function(l){
+      var c = l.split('\t'), id = +c[ig], v = (c[iv]||'').trim();
+      var note = inn>=0 ? (c[inn]||'') : '', u = iu>=0 ? (c[iu]||'') : '';
+      if(!known[id] || !(v in VERDICT)) return;
+      state[id] = {v:v, n:note, u:u, t:new Date().toISOString()}; n++;
+    });
+    save(); changes = 0; showWarn(); renderList(); toast('Imported '+n+' verdict(s)');
+  };
+  rd.readAsText(file); e.target.value = '';
+});
+$('btnReset').addEventListener('click', function(){
+  var n = Object.keys(state).length;
+  if(!n){ toast('No saved verdicts'); return; }
+  if(!confirm('This clears '+n+' verdict(s) stored in this browser and cannot be undone (unless you exported them). Continue?')) return;
+  state = {}; changes = 0; save(); renderList();
+});
+window.addEventListener('beforeunload', function(e){
+  if(!storageOK && Object.keys(state).length){ e.preventDefault(); e.returnValue = ''; }
+});
+
+$('nTotal').textContent = DATA.length;
+$('nExtra').textContent = DATA.filter(function(r){return r.extra;}).length;
+load(); showWarn(); renderList();
+})();
+</script>
+</body>
+</html>
