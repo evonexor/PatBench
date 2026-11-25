@@ -1,0 +1,17 @@
+{
+  "pipeline/02_extract": {
+    "sha256": "148c103fb46fd807b6d7f64613ac36b3ece45528112a02d4097a6a1184b407f7",
+    "formula": "glob_bytes",
+    "run": "uspto-sar-full-20261004, version 0.8.0-full"
+  },
+  "pipeline/03_recovery": {
+    "sha256": "81fd68912e6f5bb92bb3629ba3fbc8f1ba68e40ebd9431f91598d1b8a3b89fd2",
+    "formula": "rglob_named",
+    "run": "uspto-sar-recovery-20261006"
+  },
+  "pipeline/04_catalog": {
+    "sha256": "67b554fd4599c2cde756f0689263214bb22fdb97ef46e7631c49970d4f7e0214",
+    "formula": "glob_bytes",
+    "run": "uspto-all-structures-20261004, version 0.9.1-sharded-aggregation"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "BRO5_HEAVY": 50,
+  "DUPLICATE_MAX_DIFF": 0.05,
+  "DUPLICATE_OVERLAP": 0.8,
+  "FAMILY_OVERLAP": 0.5,
+  "FRAGMENT_GROUP_MEDIAN_HEAVY": 16,
+  "HEAVY_MAX": 70,
+  "HEAVY_MIN": 10,
+  "HIGH_CONTRAST_RANGE": 2.0,
+  "MAX_REPLICATE_SPREAD": 1.0,
+  "MIN_GROUP": 10,
+  "MIN_PATENT_MOLECULES": 20,
+  "MIN_RANGE": 1.0,
+  "NAME": "PatBench",
+  "PACT_FLAG_HIGH": 11.0,
+  "PACT_FLAG_LOW": 3.0,
+  "PUBLIC_MAX_OFFSET": 1.0,
+  "PUBLIC_MIN_MATCHES": 3,
+  "PUBLIC_SOURCES": [
+    "BindingDB",
+    "ChEMBL"
+  ],
+  "RANDOM_FRACTIONS": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "SCAFFOLD_FRACTIONS": [
+    0.7,
+    0.15,
+    0.15
+  ],
+  "SEED": 20261019,
+  "TASK_TEST_FROM": {
+    "rank_complex_mutant": 2018
+  },
+  "TEST_FROM_PRIORITY_YEAR": 2016,
+  "TEST_FROM_YEAR": 2021,
+  "TEST_MIN_GRANT_YEAR": 2020,
+  "VALID_FRACTION": 0.15,
+  "VERSION": "1.0"
+}
