@@ -8,7 +8,7 @@ This repository contains **code only**. The released dataset is deposited on fig
 
 ![PatBench framework and task sets](assets/fig1_overview.png)
 
-*Figure 1. Overview of the PatBench agent-curated pipeline (deterministic extraction, LLM-agent target curation and structure cleaning, and expert manual verification) and the six benchmark task sets.*
+*Figure 1. Overview of the PatBench agent-curated pipeline (deterministic extraction, LLM-agent target curation and structure cleaning, and within-assay task construction) and the six benchmark task sets.*
 
 ## Dataset summary
 
